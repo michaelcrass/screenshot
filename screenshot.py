@@ -1,13 +1,14 @@
 import pyautogui
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog, messagebox
+from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk
 import os
 from datetime import datetime
 
 # Variablen zum Speichern des Dateipfads und der Image-Objekte
 file_path = None
+desktop_path = None
 img = None
 img_copy = None
 pixelate_mode = False  # Verpixeln-Modus deaktiviert
@@ -15,7 +16,7 @@ zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
 
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
-    global img, img_copy, file_path
+    global img, img_copy, file_path,desktop_path
 
     # Screenshot erstellen
     screenshot = pyautogui.screenshot()
@@ -41,7 +42,6 @@ def take_screenshot():
 def save_image():
     if img_copy and file_path:
         img_copy.save(file_path)
-        # messagebox.showinfo("Gespeichert", f"Das Bild wurde erfolgreich unter {file_path} gespeichert.")
         update_status(f"Gespeichert. Das Bild wurde erfolgreich unter {file_path} gespeichert.")
     else:
         messagebox.showwarning("Fehler", "Kein Bild zum Speichern gefunden.")
@@ -105,19 +105,39 @@ def on_mouse_up(event):
     end_x = event.x
     end_y = event.y
 
+    # If start_x is greater than end_x, swap them
+    if start_x > end_x:
+        start_x, end_x = end_x, start_x
+
+    # If start_y is greater than end_y, swap them
+    if start_y > end_y:
+        start_y, end_y = end_y, start_y
+
+
     if pixelate_mode:
         pixelate_area(start_x, start_y, end_x, end_y)
     elif zuschneiden_mode:
         crop_image()
 
-# # Funktion, um den "Zuschneiden"-Button zu aktivieren
-# def enable_crop_button():
-#     crop_menu.entryconfig("Bild zuschneiden", state=tk.NORMAL)
-#     edit_menu.entryconfig("Verpixeln", state=tk.NORMAL)
+def rename():
+    global file_path
+    old_name = file_path
+    # Ask the user for the new name
+    new_name = simpledialog.askstring("Input", "Neuer Name?", parent=root)
+
+    # Print the name or handle it further
+    if new_name:
+        new_name = os.path.join(desktop_path, f"screenshot_{new_name}.png")
+        os.rename(old_name, new_name)
+        file_path = new_name
+        update_status(f"Datei umbenannt.")
+    else:
+        messagebox.showwarning("Fehler", "No name entered.")
 
 # Funktion zum Aktualisieren der Statusleiste
 def update_status(new_status):
     status_var.set(new_status)
+
 def exit_program():
     root.destroy() # Fenster schließen
     # root.quit() # Programm beenden
@@ -142,6 +162,7 @@ file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="Datei", menu=file_menu)
 file_menu.add_command(label="Screenshot aufnehmen", command=take_screenshot)
 file_menu.add_command(label="Bild speichern", command=save_image)
+file_menu.add_command(label="Bild umbenennen", command=rename)
 file_menu.add_command(label="Beenden", command=exit_program)
 
 # Menü zum Zuschneiden und Verpixeln
