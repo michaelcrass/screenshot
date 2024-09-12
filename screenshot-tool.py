@@ -5,6 +5,7 @@ from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk
 import os
 from datetime import datetime
+from time import sleep
 
 # Variablen zum Speichern des Dateipfads und der Image-Objekte
 file_path = None
@@ -17,6 +18,9 @@ zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
     global img, img_copy, file_path,desktop_path
+
+    hide()
+    sleep(1)
 
     # Screenshot erstellen
     screenshot = pyautogui.screenshot()
@@ -35,6 +39,8 @@ def take_screenshot():
     open_image(file_path)
 
     # enable_crop_button()  # Zuschneiden aktivieren
+
+    show()
 
     root.state('zoomed')  # Vollbildmodus
 
@@ -142,9 +148,18 @@ def exit_program():
     root.destroy() # Fenster schließen
     # root.quit() # Programm beenden
 
+# Show the window
+def show():
+    root.deiconify()
+ 
+# Hide the window
+def hide():
+    root.withdraw()
+
+
 # GUI erstellen
 root = tk.Tk()
-root.title("Screenshot und Bearbeitung")
+root.title("Screenshot-Tool")
 
 # Menüleiste
 menu = tk.Menu(root)
@@ -183,4 +198,6 @@ canvas.bind("<ButtonPress-1>", on_mouse_down)
 canvas.bind("<ButtonRelease-1>", on_mouse_up)
 
 # Hauptloop
+take_screenshot()
 root.mainloop()
+
