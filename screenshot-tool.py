@@ -14,13 +14,15 @@ img = None
 img_copy = None
 pixelate_mode = False  # Verpixeln-Modus deaktiviert
 zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
+screenshot_in_gui = False
 
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
-    global img, img_copy, file_path,desktop_path
+    global img, img_copy, file_path,desktop_path, screenshot_in_gui
 
     hide()
-    sleep(1)
+    if screenshot_in_gui:
+        sleep(1)
 
     # Screenshot erstellen
     screenshot = pyautogui.screenshot()
@@ -43,6 +45,7 @@ def take_screenshot():
     show()
 
     root.state('zoomed')  # Vollbildmodus
+    screenshot_in_gui = True
 
 # Funktion, um das Bild erneut ohne Dateinameingabe zu speichern
 def save_image():
