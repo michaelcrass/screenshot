@@ -8,21 +8,16 @@ from datetime import datetime
 from time import sleep
 
 # Variablen zum Speichern des Dateipfads und der Image-Objekte
-file_path = None
-desktop_path = None
-img = None
-img_copy = None
+file_path, desktop_path, img, img_copy = None
 pixelate_mode = False  # Verpixeln-Modus deaktiviert
 zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
 screenshot_in_gui = False
-
-
 
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
     global img, img_copy, file_path,desktop_path, screenshot_in_gui
 
-    hide()
+    hide() # hide window
     if screenshot_in_gui:
         sleep(1)
 
@@ -42,7 +37,7 @@ def take_screenshot():
     img_copy = img.copy()
     open_image(file_path)
 
-    show()
+    show() # show Window
 
     root.state('zoomed')  # Vollbildmodus
     screenshot_in_gui = True
@@ -151,21 +146,6 @@ def on_mouse_up(event):
     elif zuschneiden_mode:
         crop_image()
 
-def rename():
-    global file_path
-    old_name = file_path
-    # Ask the user for the new name
-    new_name = simpledialog.askstring("Input", "Neuer Name?", parent=root)
-
-    # Print the name or handle it further
-    if new_name:
-        new_name = os.path.join(desktop_path, f"screenshot_{new_name}.png")
-        os.rename(old_name, new_name)
-        file_path = new_name
-        update_status(f"Datei umbenannt.")
-    else:
-        messagebox.showwarning("Fehler", "No name entered.")
-
 # Funktion zum Aktualisieren der Statusleiste
 def update_status(new_status):
     status_var.set(new_status)
@@ -211,7 +191,6 @@ edit_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="Bearbeiten", menu=edit_menu)
 edit_menu.add_command(label="Bild zuschneiden", command=enable_zuschneiden_mode)
 edit_menu.add_command(label="Verpixeln", command=enable_pixelate_mode)
-edit_menu.add_command(label="Rotieren", command=rotate_image)
 
 # Canvas zur Anzeige des Bildes
 canvas = tk.Canvas(root)
