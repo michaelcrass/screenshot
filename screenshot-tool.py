@@ -17,8 +17,6 @@ pixelate_mode = False  # Verpixeln-Modus deaktiviert
 zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
 screenshot_in_gui = False
 
-
-
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
     global img, img_copy, file_path,desktop_path, screenshot_in_gui
@@ -43,8 +41,6 @@ def take_screenshot():
     img_copy = img.copy()
     open_image(file_path)
 
-    # enable_crop_button()  # Zuschneiden aktivieren
-
     show()
 
     root.state('zoomed')  # Vollbildmodus
@@ -58,11 +54,9 @@ def save_image():
     else:
         messagebox.showwarning("Fehler", "Kein Bild zum Speichern gefunden.")
 
-
 def save_image_as():
     global img_copy,file_path
-    if img_copy:  # Check if an image is loaded
-        
+    if img_copy:  # Check if an image is loaded        
         # Save the image with the provided name
         save_path = filedialog.asksaveasfilename(defaultextension=".png", 
                                                      initialfile="screenshot", 
@@ -76,13 +70,9 @@ def save_image_as():
     else:
         tk.messagebox.showwarning("Warning", "No image loaded to save.")
 
-
-
-
 # Funktion, um das Bild zu öffnen und anzuzeigen
 def open_image(file_path):
     global img, photo, img_copy
-
     img = Image.open(file_path)
     img_copy = img.copy()
     photo = ImageTk.PhotoImage(img_copy)
@@ -95,14 +85,10 @@ def open_image_file():
     _x = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.jpeg;*.bmp;*.gif")])
     
     if _x:
-        file_path = _x
-        
+        file_path = _x        
         img = Image.open(file_path)
         img_copy = img.copy()
         open_image(file_path)
-
-
-
 
 # Funktion, um Bereiche zu verpixeln
 def pixelate_area(x0, y0, x1, y1):
@@ -125,8 +111,7 @@ def crop_image():
 
 # Funktion, um den Verpixeln-Modus zu aktivieren
 def enable_pixelate_mode():
-    global pixelate_mode
-    global zuschneiden_mode
+    global pixelate_mode, zuschneiden_mode
     pixelate_mode = True
     zuschneiden_mode = False
     # messagebox.showinfo("Modus aktiviert", "Verpixeln-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
@@ -134,14 +119,11 @@ def enable_pixelate_mode():
 
 # Funktion, um den Zuschneiden-Modus zu aktivieren
 def enable_zuschneiden_mode():
-    global pixelate_mode
-    global zuschneiden_mode
+    global pixelate_mode, zuschneiden_mode
     pixelate_mode = False
     zuschneiden_mode = True
     # messagebox.showinfo("Modus aktiviert", "Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
     update_status("Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
-
-
 
 # Funktion, um den ausgewählten Bereich zu markieren
 def on_mouse_down(event):
@@ -244,4 +226,3 @@ canvas.bind("<ButtonRelease-1>", on_mouse_up)
 # Hauptloop
 take_screenshot()
 root.mainloop()
-
