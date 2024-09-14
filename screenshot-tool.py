@@ -90,14 +90,15 @@ def open_image(file_path):
     canvas.config(scrollregion=canvas.bbox(tk.ALL))
 
 def open_image_file():
-    global file_path
+    global file_path,img_copy
     # Open a file dialog to select the image
     _x = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.jpeg;*.bmp;*.gif")])
     
     if _x:
         file_path = _x
         
-
+        img = Image.open(file_path)
+        img_copy = img.copy()
         open_image(file_path)
 
 
