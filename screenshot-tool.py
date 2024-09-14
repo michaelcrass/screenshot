@@ -1,11 +1,12 @@
 import pyautogui
 import tkinter as tk
 from tkinter import ttk
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox, filedialog
 from PIL import Image, ImageTk
 import os
 from datetime import datetime
 from time import sleep
+import shutil
 
 # Variablen zum Speichern des Dateipfads und der Image-Objekte
 file_path = None
@@ -15,6 +16,8 @@ img_copy = None
 pixelate_mode = False  # Verpixeln-Modus deaktiviert
 zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
 screenshot_in_gui = False
+
+
 
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
@@ -51,9 +54,30 @@ def take_screenshot():
 def save_image():
     if img_copy and file_path:
         img_copy.save(file_path)
-        update_status(f"Gespeichert. Das Bild wurde erfolgreich unter {file_path} gespeichert.")
+        update_status(f"Das Bild wurde erfolgreich unter {file_path} gespeichert.")
     else:
         messagebox.showwarning("Fehler", "Kein Bild zum Speichern gefunden.")
+
+
+def save_image_as():
+    global img_copy,file_path
+    if img_copy:  # Check if an image is loaded
+        
+        # Save the image with the provided name
+        save_path = filedialog.asksaveasfilename(defaultextension=".png", 
+                                                     initialfile="screenshot", 
+                                                     filetypes=[("PNG files", "*.png"), 
+                                                                ("JPEG files", "*.jpg"),
+                                                                ("All files", "*.*")])
+        if save_path:
+            img_copy.save(save_path)
+            update_status(f"Das Bild wurde erfolgreich unter {file_path} gespeichert.")
+            file_path = save_path
+    else:
+        tk.messagebox.showwarning("Warning", "No image loaded to save.")
+
+
+
 
 # Funktion, um das Bild zu öffnen und anzuzeigen
 def open_image(file_path):
@@ -64,6 +88,20 @@ def open_image(file_path):
     photo = ImageTk.PhotoImage(img_copy)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
     canvas.config(scrollregion=canvas.bbox(tk.ALL))
+
+def open_image_file():
+    global file_path
+    # Open a file dialog to select the image
+    _x = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.jpeg;*.bmp;*.gif")])
+    
+    if _x:
+        file_path = _x
+        
+
+        open_image(file_path)
+
+
+
 
 # Funktion, um Bereiche zu verpixeln
 def pixelate_area(x0, y0, x1, y1):
@@ -101,6 +139,7 @@ def enable_zuschneiden_mode():
     zuschneiden_mode = True
     # messagebox.showinfo("Modus aktiviert", "Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
     update_status("Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
+
 
 
 # Funktion, um den ausgewählten Bereich zu markieren
@@ -179,8 +218,9 @@ status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="Datei", menu=file_menu)
 file_menu.add_command(label="Screenshot aufnehmen", command=take_screenshot)
+file_menu.add_command(label="Bilddatei öffnen ...", command=open_image_file)
 file_menu.add_command(label="Bild speichern", command=save_image)
-file_menu.add_command(label="Bild umbenennen", command=rename)
+file_menu.add_command(label="Bild speichern unter ...", command=save_image_as)
 file_menu.add_command(label="Beenden", command=exit_program)
 
 # Menü zum Zuschneiden und Verpixeln
