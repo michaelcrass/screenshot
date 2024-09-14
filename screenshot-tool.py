@@ -61,7 +61,7 @@ def save_image_as():
             update_status(f"Image saved! File name: {file_path}")
             file_path = save_path
     else:
-        tk.messagebox.showwarning("Warning", "No image loaded to save.")
+        messagebox.showwarning("Warning", "No image loaded to save.")
 
 # Funktion, um das Bild zu öffnen und anzuzeigen
 def open_image(file_path):
