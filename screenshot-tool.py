@@ -7,15 +7,12 @@ import os
 from datetime import datetime
 from time import sleep
 
-# Variablen zum Speichern des Dateipfads und der Image-Objekte
-file_path, desktop_path, img, img_copy = None
-pixelate_mode = False  # Verpixeln-Modus deaktiviert
-zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
-screenshot_in_gui = False
+file_path, desktop_path, img, img_copy, timestamp = None, None, None, None, None
+pixelate_mode, zuschneiden_mode, screenshot_in_gui = False, False, False
 
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
-    global img, img_copy, file_path,desktop_path, screenshot_in_gui
+    global img, img_copy, file_path,desktop_path, screenshot_in_gui,timestamp
 
     hide() # hide window
     if screenshot_in_gui:
@@ -46,22 +43,22 @@ def take_screenshot():
 def save_image():
     if img_copy and file_path:
         img_copy.save(file_path)
-        update_status(f"Das Bild wurde erfolgreich unter {file_path} gespeichert.")
+        update_status(f"Image saved! File name: {file_path}.")
     else:
-        messagebox.showwarning("Fehler", "Kein Bild zum Speichern gefunden.")
+        messagebox.showwarning("Error", "No image loaded to save.")
 
 def save_image_as():
-    global img_copy,file_path
+    global img_copy,file_path,timestamp
     if img_copy:  # Check if an image is loaded        
         # Save the image with the provided name
         save_path = filedialog.asksaveasfilename(defaultextension=".png", 
-                                                     initialfile="screenshot", 
+                                                     initialfile=f"screenshot_{timestamp}", 
                                                      filetypes=[("PNG files", "*.png"), 
                                                                 ("JPEG files", "*.jpg"),
                                                                 ("All files", "*.*")])
         if save_path:
             img_copy.save(save_path)
-            update_status(f"Das Bild wurde erfolgreich unter {file_path} gespeichert.")
+            update_status(f"Image saved! File name: {file_path}.")
             file_path = save_path
     else:
         tk.messagebox.showwarning("Warning", "No image loaded to save.")
@@ -111,16 +108,14 @@ def enable_pixelate_mode():
     global pixelate_mode, zuschneiden_mode
     pixelate_mode = True
     zuschneiden_mode = False
-    # messagebox.showinfo("Modus aktiviert", "Verpixeln-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
-    update_status("Verpixeln-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
+    update_status("Pixelation mode is activated. Select an area with the mouse.")
 
 # Funktion, um den Zuschneiden-Modus zu aktivieren
 def enable_zuschneiden_mode():
     global pixelate_mode, zuschneiden_mode
     pixelate_mode = False
     zuschneiden_mode = True
-    # messagebox.showinfo("Modus aktiviert", "Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
-    update_status("Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
+    update_status("Cropping mode is activated. Select an area with the mouse.")
 
 # Funktion, um den ausgewählten Bereich zu markieren
 def on_mouse_down(event):
@@ -164,7 +159,7 @@ def hide():
 
 # GUI erstellen
 root = tk.Tk()
-root.title("Screenshot-Tool")
+root.title("Screenshot Tool")
 
 # Menüleiste
 menu = tk.Menu(root)
@@ -179,18 +174,20 @@ status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
 # Screenshot-Menü
 file_menu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label="Datei", menu=file_menu)
-file_menu.add_command(label="Screenshot aufnehmen", command=take_screenshot)
-file_menu.add_command(label="Bilddatei öffnen ...", command=open_image_file)
-file_menu.add_command(label="Bild speichern", command=save_image)
-file_menu.add_command(label="Bild speichern unter ...", command=save_image_as)
-file_menu.add_command(label="Beenden", command=exit_program)
+menu.add_cascade(label="File", menu=file_menu)
+file_menu.add_command(label="Take a screenshot", command=take_screenshot)
+file_menu.add_separator()
+file_menu.add_command(label="Open ...", command=open_image_file)
+file_menu.add_command(label="Save", command=save_image)
+file_menu.add_command(label="Save as ...", command=save_image_as)
+file_menu.add_separator()
+file_menu.add_command(label="Exit", command=exit_program)
 
 # Menü zum Zuschneiden und Verpixeln
 edit_menu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label="Bearbeiten", menu=edit_menu)
-edit_menu.add_command(label="Bild zuschneiden", command=enable_zuschneiden_mode)
-edit_menu.add_command(label="Verpixeln", command=enable_pixelate_mode)
+menu.add_cascade(label="Edit", menu=edit_menu)
+edit_menu.add_command(label="Cropping", command=enable_zuschneiden_mode)
+edit_menu.add_command(label="Pixelation", command=enable_pixelate_mode)
 
 # Canvas zur Anzeige des Bildes
 canvas = tk.Canvas(root)
