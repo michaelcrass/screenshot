@@ -43,7 +43,7 @@ def take_screenshot():
 def save_image():
     if img_copy and file_path:
         img_copy.save(file_path)
-        update_status(f"Image saved! File name: {file_path}.")
+        update_status(f"Image saved! File name: {file_path}")
     else:
         messagebox.showwarning("Error", "No image loaded to save.")
 
@@ -58,7 +58,7 @@ def save_image_as():
                                                                 ("All files", "*.*")])
         if save_path:
             img_copy.save(save_path)
-            update_status(f"Image saved! File name: {file_path}.")
+            update_status(f"Image saved! File name: {file_path}")
             file_path = save_path
     else:
         tk.messagebox.showwarning("Warning", "No image loaded to save.")
