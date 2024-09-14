@@ -6,7 +6,6 @@ from PIL import Image, ImageTk
 import os
 from datetime import datetime
 from time import sleep
-import shutil
 
 # Variablen zum Speichern des Dateipfads und der Image-Objekte
 file_path = None
@@ -16,8 +15,8 @@ img_copy = None
 pixelate_mode = False  # Verpixeln-Modus deaktiviert
 zuschneiden_mode = False  # Zuschneiden-Modus deaktiviert
 screenshot_in_gui = False
-
-
+photo = None
+canvas_img = None
 
 # Funktion, um einen Screenshot zu machen
 def take_screenshot():
@@ -42,8 +41,6 @@ def take_screenshot():
     img = Image.open(file_path)
     img_copy = img.copy()
     open_image(file_path)
-
-    # enable_crop_button()  # Zuschneiden aktivieren
 
     show()
 
@@ -76,17 +73,14 @@ def save_image_as():
     else:
         tk.messagebox.showwarning("Warning", "No image loaded to save.")
 
-
-
-
 # Funktion, um das Bild zu öffnen und anzuzeigen
 def open_image(file_path):
-    global img, photo, img_copy
+    global img, photo, img_copy, canvas_img
 
     img = Image.open(file_path)
     img_copy = img.copy()
     photo = ImageTk.PhotoImage(img_copy)
-    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    canvas_img= canvas.create_image(0, 0, anchor=tk.NW, image=photo)
     canvas.config(scrollregion=canvas.bbox(tk.ALL))
 
 def open_image_file():
@@ -101,26 +95,23 @@ def open_image_file():
         img_copy = img.copy()
         open_image(file_path)
 
-
-
-
 # Funktion, um Bereiche zu verpixeln
 def pixelate_area(x0, y0, x1, y1):
-    global img_copy, photo
+    global img_copy, photo, canvas_img
     cropped_area = img_copy.crop((x0, y0, x1, y1))
     pixelated_area = cropped_area.resize((10, 10), resample=Image.NEAREST).resize(cropped_area.size, Image.NEAREST)
     img_copy.paste(pixelated_area, (x0, y0, x1, y1))
     photo = ImageTk.PhotoImage(img_copy)
-    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    canvas_img = canvas.create_image(0, 0, anchor=tk.NW, image=photo)
 
 # Funktion zum Zuschneiden des Bildes
 def crop_image():
-    global img_copy, photo, start_x, start_y, end_x, end_y, zuschneiden_mode
+    global img_copy, photo, start_x, start_y, end_x, end_y, zuschneiden_mode, canvas_img
 
     if start_x is not None and start_y is not None and end_x is not None and end_y is not None:
         img_copy = img_copy.crop((start_x, start_y, end_x, end_y))
         photo = ImageTk.PhotoImage(img_copy)
-        canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+        canvas_img = canvas.create_image(0, 0, anchor=tk.NW, image=photo)
         canvas.config(scrollregion=canvas.bbox(tk.ALL))
 
 # Funktion, um den Verpixeln-Modus zu aktivieren
@@ -141,8 +132,6 @@ def enable_zuschneiden_mode():
     # messagebox.showinfo("Modus aktiviert", "Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
     update_status("Zuschneiden-Modus ist aktiviert. Wähle einen Bereich mit der Maus aus.")
 
-
-
 # Funktion, um den ausgewählten Bereich zu markieren
 def on_mouse_down(event):
     global start_x, start_y
@@ -161,7 +150,6 @@ def on_mouse_up(event):
     # If start_y is greater than end_y, swap them
     if start_y > end_y:
         start_y, end_y = end_y, start_y
-
 
     if pixelate_mode:
         pixelate_area(start_x, start_y, end_x, end_y)
@@ -199,7 +187,6 @@ def show():
 def hide():
     root.withdraw()
 
-
 # GUI erstellen
 root = tk.Tk()
 root.title("Screenshot-Tool")
@@ -229,6 +216,7 @@ edit_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="Bearbeiten", menu=edit_menu)
 edit_menu.add_command(label="Bild zuschneiden", command=enable_zuschneiden_mode)
 edit_menu.add_command(label="Verpixeln", command=enable_pixelate_mode)
+edit_menu.add_command(label="Rotieren", command=rotate_image)
 
 # Canvas zur Anzeige des Bildes
 canvas = tk.Canvas(root)
@@ -244,4 +232,3 @@ canvas.bind("<ButtonRelease-1>", on_mouse_up)
 # Hauptloop
 take_screenshot()
 root.mainloop()
-
