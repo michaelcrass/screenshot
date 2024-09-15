@@ -150,7 +150,7 @@ def get_line_size():
 
 # Funktion, um Bereiche zu verpixeln
 def pixelate_area(x0, y0, x1, y1):
-    global img_copy, photo
+    global img_copy, photo, canvas
     cropped_area = img_copy.crop((x0, y0, x1, y1))
     pixelated_area = cropped_area.resize((10, 10), resample=Image.NEAREST).resize(cropped_area.size, Image.NEAREST)
     img_copy.paste(pixelated_area, (x0, y0, x1, y1))
@@ -159,7 +159,7 @@ def pixelate_area(x0, y0, x1, y1):
 
 # Funktion zum Zuschneiden des Bildes
 def crop_image():
-    global img_copy, photo, start_x, start_y, end_x, end_y, zuschneiden_mode
+    global img_copy, photo, start_x, start_y, end_x, end_y, zuschneiden_mode, canvas
 
     if start_x is not None and start_y is not None and end_x is not None and end_y is not None:
         img_copy = img_copy.crop((start_x, start_y, end_x, end_y))
@@ -215,7 +215,7 @@ def on_mouse_drag(event):
 
 # Mouse event to finish drawing
 def on_mouse_up(event):
-    global current_line, start_x, start_y, end_x, end_y, img_copy,photo, chosen_color, line_width
+    global current_line, start_x, start_y, end_x, end_y, img_copy,photo, chosen_color, line_width, canvas
     if paint_mode:
         # Finish the line
         canvas.coords(current_line, start_x, start_y, event.x, event.y)
@@ -228,6 +228,9 @@ def on_mouse_up(event):
         
         img_copy.paste(canvas.coords(current_line, start_x, start_y, event.x, event.y))
         photo = ImageTk.PhotoImage(img_copy)
+
+        canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+        canvas.config(scrollregion=canvas.bbox(tk.ALL))
       
 
     else:
